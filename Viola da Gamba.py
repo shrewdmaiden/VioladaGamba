@@ -5,6 +5,7 @@ from kivy.uix.widget import Widget
 from kivy.graphics import *
 from kivy.uix.button import Button
 from kivy.uix.label import Label
+from kivy.clock import Clock
 
 import random
 
@@ -60,11 +61,11 @@ class Game(Widget):
     def __init__(self):
         super(Game, self).__init__()
 
-        self.string_pos = {"D": [100, 10, 100, 500],
-                           "A": [150, 10, 150, 500]}
+        self.string_pos = {"D": [150, 10, 150, 500],
+                           "A": [100, 10, 100, 500]}
 
-        self.fret_pos = {"open": [100, 500, 150, 500],
-                         "First": [100, 450, 150, 450]}
+        self.fret_pos = {0: [100, 500, 150, 500],
+                         1: [100, 450, 150, 450]}
 
         self.string_list = []
         self.fret_list = []
@@ -98,7 +99,7 @@ class Game(Widget):
                     start_note += 1
                 else:
                     start_note = 0
-
+        print(self.notes)
         self.string_choice = random.choice(self.string_list)
         self.fret_choice = random.choice(self.fret_list)
         self.answer = self.notes[(self.string_choice, self.fret_choice)]
@@ -141,18 +142,19 @@ class Game(Widget):
     def respond(self,instance):
         if instance.text == self.answer:
             self.answer_label.text = "Correct"
-            print(instance.text)
-            print(self.answer)
         else:
             self.answer_label.text = "Wrong"
-            print(instance.text)
-            print(self.answer)
+        def reset_text(*args):
+            self.answer_label.text = ""
+
+        Clock.schedule_once(reset_text, 2)
 
     def choose_answer(self,*ignore):
         self.string_choice = random.choice(self.string_list)
         self.fret_choice = random.choice(self.fret_list)
         self.answer = self.notes[(self.string_choice, self.fret_choice)]
         self.choices = [self.answer]
+        print(self.answer)
         counter = 0
         while counter < 3:
             note = random.choice(self.note_names)
