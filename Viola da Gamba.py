@@ -6,8 +6,15 @@ from kivy.graphics import *
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.clock import Clock
+from kivy.uix.image import Image
+from kivy.uix.floatlayout import FloatLayout
 
 import random
+
+class Sprite(Image):
+    def __init__(self,**kwargs):
+        super(Sprite,self).__init__(**kwargs)
+        self.size = self.texture_size
 
 class String(Widget):
     def __init__(self, startx, starty, endx, endy, name):
@@ -57,7 +64,7 @@ class Fret(Widget):
 class Button(Button):
     pass
 
-class Game(Widget):
+class Game(FloatLayout):
     def __init__(self):
         super(Game, self).__init__()
 
@@ -112,6 +119,9 @@ class Game(Widget):
                 self.choices.append(note)
                 counter += 1
         random.shuffle(self.choices)
+
+        self.background = Sprite(source='Violcropped.png',pos_hint={"top":1})
+        self.add_widget(self.background)
 
         for key in self.string_pos:
             self.add_widget(String(self.string_pos[key][0],self.string_pos[key][1],self.string_pos[key][2],self.string_pos[key][3],key))
