@@ -8,10 +8,12 @@ from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.uix.image import Image
 from kivy.uix.floatlayout import FloatLayout
+from kivy.core.window import Window
+from kivy.properties import NumericProperty
 
 import random
 
-class Sprite(Image):
+'''class Sprite(Image):
     def __init__(self,**kwargs):
         super(Sprite,self).__init__(**kwargs)
         self.size = self.texture_size
@@ -26,17 +28,17 @@ class String(Widget):
         self.name = name
         with self.canvas:
             Color(255, 255, 255, mode='rgb')
-            Line(points=(self.startx, self.starty, self.endx, self.endy))
+            Line(points=(self.x, self.y, self.x+self.width, self.y + self.height))
 
     def highlight(self):
         with self.canvas:
             Color(255, 0, 0, mode='rgb')
-            Line(points=(self.startx, self.starty, self.endx, self.endy))
+            Line(points=(self.x, self.y, self.x+self.width, self.y + self.height))
 
     def clear(self):
         with self.canvas:
             Color(255,255,255, mode='rgb')
-            Line(points=(self.startx, self.starty, self.endx, self.endy))
+            Line(points=(self.x, self.y, self.x+self.width, self.y + self.height))
 
 
 class Fret(Widget):
@@ -106,7 +108,6 @@ class Game(FloatLayout):
                     start_note += 1
                 else:
                     start_note = 0
-        print(self.notes)
         self.string_choice = random.choice(self.string_list)
         self.fret_choice = random.choice(self.fret_list)
         self.answer = self.notes[(self.string_choice, self.fret_choice)]
@@ -120,7 +121,8 @@ class Game(FloatLayout):
                 counter += 1
         random.shuffle(self.choices)
 
-        self.background = Sprite(source='Violcropped.png',pos_hint={"top":1})
+        self.background = Sprite(source='Violcropped.png')
+        Window.size = self.background.size
         self.add_widget(self.background)
 
         for key in self.string_pos:
@@ -129,14 +131,16 @@ class Game(FloatLayout):
         for key in self.fret_pos:
             self.add_widget(Fret(self.fret_pos[key][0],self.fret_pos[key][1],self.fret_pos[key][2],self.fret_pos[key][3],key))
 
+        self.answer_label = Label()
+        self.add_widget(self.answer_label)
 
-        self.button1 = Button(text=self.choices[0], font_size=15, pos=(300, 500), size = (50, 50))
+        self.button1 = Button(text=self.choices[0], font_size=15, pos_hint={"x":.75,"y":.65}, size_hint = (.15, .1))
         self.button1.bind(on_release=self.choose_answer, on_press=self.respond)
-        self.button2 = Button(text=self.choices[1], font_size=15, pos=(300, 440), size = (50, 50))
+        self.button2 = Button(text=self.choices[1], font_size=15, pos_hint={"x":.75,"y":.5}, size_hint = (.15, .1))
         self.button2.bind(on_release=self.choose_answer, on_press=self.respond)
-        self.button3 = Button(text=self.choices[2], font_size=15, pos=(300, 315), size = (50, 50))
+        self.button3 = Button(text=self.choices[2], font_size=15, pos_hint={"x":.75,"y":.35}, size_hint = (.15, .1))
         self.button3.bind(on_release=self.choose_answer, on_press=self.respond)
-        self.button4 = Button(text=self.choices[3], font_size=15, pos=(300, 200), size = (50, 50))
+        self.button4 = Button(text=self.choices[3], font_size=15, pos_hint={"x":.75,"y":.2}, size_hint = (.15, .1))
         self.button4.bind(on_release=self.choose_answer, on_press=self.respond)
 
         self.add_widget(self.button1)
@@ -144,8 +148,7 @@ class Game(FloatLayout):
         self.add_widget(self.button3)
         self.add_widget(self.button4)
 
-        self.answer_label = Label(center=(300, 300), text="")
-        self.add_widget(self.answer_label)
+
 
         self.choose_answer()
 
@@ -164,7 +167,6 @@ class Game(FloatLayout):
         self.fret_choice = random.choice(self.fret_list)
         self.answer = self.notes[(self.string_choice, self.fret_choice)]
         self.choices = [self.answer]
-        print(self.answer)
         counter = 0
         while counter < 3:
             note = random.choice(self.note_names)
@@ -182,12 +184,63 @@ class Game(FloatLayout):
         for child in self.children:
             if child.__class__.__name__ == "Button":
                 child.text = self.choices[counter]
-                counter += 1
+                counter += 1'''
+class Sprite(Image):
+    def __init__(self,**kwargs):
+        super(Sprite,self).__init__(**kwargs)
+        self.size = self.texture_size
+
+class String(Widget):
+    r = NumericProperty(0)
+    g = NumericProperty(0)
+    b = NumericProperty(0)
+    sx = NumericProperty(0)
+    sy = NumericProperty(0)
+    ex = NumericProperty(0)
+    ey = NumericProperty(0)
+    def __init__(self, **kwargs):
+        super(String, self).__init__(**kwargs)
+        self.r = 1
+        self.g = 1
+        self.b = 1
+        self.sx = 0
+        self.sy = 0
+        self.ex = 0
+        self.ey = 0
+
+
+        with self.canvas:
+            self.line = Line()
+
+
+class Viol(FloatLayout):
+    def __init__(self, **kwargs):
+        super(Viol, self).__init__(**kwargs)
+        self.astring = String(pos_hint={"x":.3},size_hint=(1,1))
+        self.astring.sy = 1
+        self.astring.sx = 1
+        self.astring.ex = -1.5
+        self.astring.ey = -1
+        self.dstring = String(pos_hint={"x":.25},size_hint=(1,1))
+        self.dstring.sy = 1
+        self.dstring.sx = 1
+        self.dstring.ex = -.3
+        self.dstring.ey = -1
+        self.estring = String(pos_hint={"x":.2},size_hint=(1,1))
+        self.estring.sy = 1
+        self.estring.sx = 1
+        self.estring.ex = .3
+        self.estring.ey = -1
+        self.cstring = String(pos_hint={"x":.15},size_hint=(1,1))
+        self.add_widget(self.astring)
+        self.add_widget(self.dstring)
+        self.add_widget(self.estring)
+
 
 
 class VioladaGamba(App):
     def build(self):
-        return Game()
+        return Viol()
 
 
 if __name__ == '__main__':
