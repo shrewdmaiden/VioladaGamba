@@ -10,82 +10,90 @@ from kivy.uix.image import Image
 from kivy.uix.floatlayout import FloatLayout
 from kivy.core.window import Window
 from kivy.properties import NumericProperty
+from kivy.config import Config
 
 import random
-
-'''class Sprite(Image):
-    def __init__(self,**kwargs):
-        super(Sprite,self).__init__(**kwargs)
-        self.size = self.texture_size
-
-class String(Widget):
-    def __init__(self, startx, starty, endx, endy, name):
-        super(String, self).__init__()
-        self.startx = startx
-        self.starty = starty
-        self.endx = endx
-        self.endy = endy
-        self.name = name
-        with self.canvas:
-            Color(255, 255, 255, mode='rgb')
-            Line(points=(self.x, self.y, self.x+self.width, self.y + self.height))
-
-    def highlight(self):
-        with self.canvas:
-            Color(255, 0, 0, mode='rgb')
-            Line(points=(self.x, self.y, self.x+self.width, self.y + self.height))
-
-    def clear(self):
-        with self.canvas:
-            Color(255,255,255, mode='rgb')
-            Line(points=(self.x, self.y, self.x+self.width, self.y + self.height))
-
-
-class Fret(Widget):
-    def __init__(self, startx, starty, endx, endy, name):
-        super(Fret, self).__init__()
-        self.startx = startx
-        self.starty = starty
-        self.endx = endx
-        self.endy = endy
-        self.name = name
-        with self.canvas:
-            Color(255, 255, 255, mode='rgb')
-            Line(points=(self.startx, self.starty, self.endx, self.endy))
-
-    def highlight(self):
-        with self.canvas:
-            Color(255, 0, 0, mode='rgb')
-            Line(points=(self.startx, self.starty, self.endx, self.endy))
-
-    def clear(self):
-        with self.canvas:
-            Color(255,255,255, mode='rgb')
-            Line(points=(self.startx, self.starty, self.endx, self.endy))
 
 class Button(Button):
     pass
 
+class Image(Image):
+    pass
+
+class String(Widget):
+    r = NumericProperty(255)
+    g = NumericProperty(255)
+    b = NumericProperty(255)
+    def __init__(self,startx,starty,endx,endy, name):
+        super(String, self).__init__()
+        self.name = name
+        self.startx = startx
+        self.endx = endx
+        self.starty = starty
+        self.endy = endy
+        with self.canvas:
+            self.line = Line(points=(self.startx,self.starty,self.endx,self.endy))
+
+class Fret(Widget):
+    r = NumericProperty(255)
+    g = NumericProperty(255)
+    b = NumericProperty(255)
+    def __init__(self,startx,starty,endx,endy, name):
+        super(Fret, self).__init__()
+        self.name = name
+        self.startx = startx
+        self.endx = endx
+        self.starty = starty
+        self.endy = endy
+        with self.canvas:
+            self.line = Line(points=(self.startx,self.starty,self.endx,self.endy))
+
 class Game(FloatLayout):
-    def __init__(self):
-        super(Game, self).__init__()
+    def __init__(self, **kwargs):
+        super(Game, self).__init__(**kwargs)
+        self.viol = Image(source="Violcropped.png")
+        self.viol.size = Window.size
+        self.add_widget(self.viol)
+        self.image_width = self.viol.get_norm_image_size()[0]
+        self.image_height = self.viol.get_norm_image_size()[1]
+        self.image_left = Window.size[0]/2 - self.image_width/2
+        self.image_bottom = Window.size[1]/2 - self.image_height/2
 
-        self.string_pos = {"D": [150, 10, 150, 500],
-                           "A": [100, 10, 100, 500]}
+        self.string_pos = {"D": [.129,.057,.155,.75],
+                           "G": [.15,.057,.17,.75],
+                           "C": [.18,.057,.185,.75],
+                           "E": [.213,.057,.2,.75],
+                           "A": [.235,.057,.215,.75],
+                           "D1": [.26,.057,.225,.75]}
 
-        self.fret_pos = {0: [100, 500, 150, 500],
-                         1: [100, 450, 150, 450]}
+        self.fret_pos = {0: [.14,.75,.24,.75],
+                         1: [.135,.72,.245,.72],
+                         2: [.135,.69,.247,.69],
+                         3: [.133,.66,.25,.66],
+                         4: [.13,.63,.252,.63],
+                         5: [.13,.6,.253,.6],
+                         6: [.128,.57,.254,.57],
+                         7: [.125,.54,.256,.54]}
 
-        self.string_list = []
-        self.fret_list = []
+        self.string_list = ["D","G","C","E","A","D1"]
+        self.fret_list = [0,1,2,3,4,5,6,7]
         self.note_names = ["A","Bb","B","C","C#","D","D#/Eb","E","F","F#","G","G#/Ab"]
         self.notes = {}
 
-        for key in self.string_pos:
-            self.string_list.append(key)
-
         for key in self.fret_pos:
-            self.fret_list.append(key)
+            self.add_widget(Fret(self.image_left+self.image_width*self.fret_pos[key][0],self.image_bottom+self.image_height*self.fret_pos[key][1],self.image_left+self.image_width*self.fret_pos[key][2],self.image_bottom+self.image_height*self.fret_pos[key][3],key))
+
+        for key in self.string_pos:
+            self.add_widget(String(self.image_left+self.string_pos[key][0]*self.image_width,self.image_bottom+self.image_height*self.string_pos[key][1],self.image_left+self.string_pos[key][2]*self.image_width,self.image_bottom+self.image_height*self.string_pos[key][3],key))
+
+        '''for child in self.children:
+            if child.__class__.__name__ == "Fret":
+                if child.name == 0:
+                    child.r = 0
+                    child.g = 0
+                    child.b = 0'''
+
+
 
         for string in self.string_list:
             start_note = 0
@@ -101,16 +109,16 @@ class Game(FloatLayout):
                 start_note = 10
             elif string == "D1":
                 start_note = 5
-
             for fret in self.fret_list:
                 self.notes[(string, fret)] = self.note_names[start_note]
                 if start_note < 11:
                     start_note += 1
                 else:
                     start_note = 0
+
         self.string_choice = random.choice(self.string_list)
         self.fret_choice = random.choice(self.fret_list)
-        self.answer = self.notes[(self.string_choice, self.fret_choice)]
+        self.answer = self.notes[(self.string_choice,self.fret_choice)]
 
         self.choices = [self.answer]
         counter = 0
@@ -120,16 +128,6 @@ class Game(FloatLayout):
                 self.choices.append(note)
                 counter += 1
         random.shuffle(self.choices)
-
-        self.background = Sprite(source='Violcropped.png')
-        Window.size = self.background.size
-        self.add_widget(self.background)
-
-        for key in self.string_pos:
-            self.add_widget(String(self.string_pos[key][0],self.string_pos[key][1],self.string_pos[key][2],self.string_pos[key][3],key))
-
-        for key in self.fret_pos:
-            self.add_widget(Fret(self.fret_pos[key][0],self.fret_pos[key][1],self.fret_pos[key][2],self.fret_pos[key][3],key))
 
         self.answer_label = Label()
         self.add_widget(self.answer_label)
@@ -142,13 +140,10 @@ class Game(FloatLayout):
         self.button3.bind(on_release=self.choose_answer, on_press=self.respond)
         self.button4 = Button(text=self.choices[3], font_size=15, pos_hint={"x":.75,"y":.2}, size_hint = (.15, .1))
         self.button4.bind(on_release=self.choose_answer, on_press=self.respond)
-
         self.add_widget(self.button1)
         self.add_widget(self.button2)
         self.add_widget(self.button3)
         self.add_widget(self.button4)
-
-
 
         self.choose_answer()
 
@@ -159,7 +154,6 @@ class Game(FloatLayout):
             self.answer_label.text = "Wrong"
         def reset_text(*args):
             self.answer_label.text = ""
-
         Clock.schedule_once(reset_text, 2)
 
     def choose_answer(self,*ignore):
@@ -174,74 +168,25 @@ class Game(FloatLayout):
                 self.choices.append(note)
                 counter += 1
         random.shuffle(self.choices)
-
         for child in self.children:
             if child.__class__.__name__ == "Fret" or child.__class__.__name__ == "String":
-                child.clear()
+                child.r = 255
+                child.g = 255
+                child.b = 255
                 if child.name == self.string_choice or child.name == self.fret_choice:
-                    child.highlight()
+                    child.g = 0
+                    child.b = 0
+
         counter = 0
         for child in self.children:
             if child.__class__.__name__ == "Button":
                 child.text = self.choices[counter]
-                counter += 1'''
-class Sprite(Image):
-    def __init__(self,**kwargs):
-        super(Sprite,self).__init__(**kwargs)
-        self.size = self.texture_size
-
-class String(Widget):
-    r = NumericProperty(0)
-    g = NumericProperty(0)
-    b = NumericProperty(0)
-    sx = NumericProperty(0)
-    sy = NumericProperty(0)
-    ex = NumericProperty(0)
-    ey = NumericProperty(0)
-    def __init__(self, **kwargs):
-        super(String, self).__init__(**kwargs)
-        self.r = 1
-        self.g = 1
-        self.b = 1
-        self.sx = 0
-        self.sy = 0
-        self.ex = 0
-        self.ey = 0
-
-
-        with self.canvas:
-            self.line = Line()
-
-
-class Viol(FloatLayout):
-    def __init__(self, **kwargs):
-        super(Viol, self).__init__(**kwargs)
-        self.astring = String(pos_hint={"x":.3},size_hint=(1,1))
-        self.astring.sy = 1
-        self.astring.sx = 1
-        self.astring.ex = -1.5
-        self.astring.ey = -1
-        self.dstring = String(pos_hint={"x":.25},size_hint=(1,1))
-        self.dstring.sy = 1
-        self.dstring.sx = 1
-        self.dstring.ex = -.3
-        self.dstring.ey = -1
-        self.estring = String(pos_hint={"x":.2},size_hint=(1,1))
-        self.estring.sy = 1
-        self.estring.sx = 1
-        self.estring.ex = .3
-        self.estring.ey = -1
-        self.cstring = String(pos_hint={"x":.15},size_hint=(1,1))
-        self.add_widget(self.astring)
-        self.add_widget(self.dstring)
-        self.add_widget(self.estring)
-
-
+                counter += 1
 
 class VioladaGamba(App):
     def build(self):
-        return Viol()
-
+        Window.clearcolor = (.45,.45,.45,1)
+        return Game()
 
 if __name__ == '__main__':
     VioladaGamba().run()
