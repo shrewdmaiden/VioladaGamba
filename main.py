@@ -153,6 +153,10 @@ class Game(FloatLayout):
             self.answer_label.text = "Correct"
             self.choose_answer("correct")
         else:
+            self.button1.disabled = True
+            self.button2.disabled = True
+            self.button3.disabled = True
+            self.button4.disabled = True
             self.answer_label.text = "The correct\nanswer is \n" + self.answer + "."
             Clock.schedule_once(partial(self.choose_answer, "wrong"),2)
 
@@ -163,6 +167,10 @@ class Game(FloatLayout):
         if answer2 == "correct":
             Clock.schedule_once(reset_text, 2)
         elif answer2 == "wrong":
+            self.button1.disabled = False
+            self.button2.disabled = False
+            self.button3.disabled = False
+            self.button4.disabled = False
             reset_text()
 
         self.string_choice = random.choice(self.string_list)
