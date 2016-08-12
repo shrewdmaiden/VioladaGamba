@@ -1,0 +1,36 @@
+<Menu>:
+    canvas:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: 'wood texture.jpg'
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 50
+        padding: 50
+        AnchorLayout:
+            Label:
+                text: 'VdG'
+                font_size: 180
+                color: 0,0,0,1
+                anchor_y: 'top'
+                font_name: 'palscri.ttf'
+
+            Label:
+                text: 'Learn the Viola da Gamba'
+                anchor_y: 'top'
+                font_name: 'gil.ttf'
+                font_size: 35
+
+        Button:
+            text: 'Explore the Viol!'
+            font_name:'gil.ttf'
+            font_size: 20
+        Button:
+            text: 'Quizzes'
+            on_press: root.manager.current = 'game'
+            font_name:'gil.ttf'
+            font_size: 20
+
+
